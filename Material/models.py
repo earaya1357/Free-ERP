@@ -15,15 +15,24 @@ class Supplier(models.Model):
     supplier_class = models.CharField('SUPPLIER_CLASS', max_length=10, null=True, blank=True)
     notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 
 class PartPrefix(models.Model):
     prefix = models.CharField('PREFIX', max_length=8, null=True, blank=True)
 
+    def __str__(self):
+        return self.prefix  
+
 
 
 class PartSuffix(models.Model):
     suffix = models.CharField('SUFFIX', max_length=8, null=True, blank=True)
+
+    def __str__(self):
+        return self.suffix
 
 
 
@@ -34,13 +43,26 @@ class PartNumberSequence(models.Model):
     spacer = models.CharField('SPACER', max_length=2, null=True, blank=True)
 
     def get_part_number_sequence(self):
-        return Concat('prefix', Value('spacer'), 'middle',Value('spacer'), 'suffix')
-
+        if self.prefix is None:
+            self.prefix = ''
+        if self.suffix is None:
+            self.suffix = ''
+        if self.middle is None:
+            self.middle = ''
+        if self.spacer is None:
+            self.spacer = ''
+        return str(Concat(self.prefix, Value(self.spacer), self.middle, Value(self.spacer), self.suffix))
+    
+    def __str__(self):
+        return self.get_part_number_sequence()
+    
+    
 
 
 class Parts(models.Model):
     part_name = models.CharField('PART_NAME', max_length=50, null=True, blank=True)
     description = models.CharField('DESCRIPTION', max_length=100, null=True, blank=True)
+    lot_serial_number = models.CharField('LOT_SERIAL_NUMBER', max_length=6, null=True, blank=True)
     part_number_style = models.ForeignKey(PartNumberSequence, on_delete=models.CASCADE, null=True, blank=True)
     base_qty = models.DecimalField('BASE_QTY', decimal_places=4, max_digits=10, null=True, blank=True)
     uom = models.CharField('UNIT_OF_MEASURE', max_length=10, null=True, blank=True)
@@ -53,8 +75,38 @@ class Parts(models.Model):
     supplier3 = models.ForeignKey(Supplier, related_name='SUPPLIER3', on_delete=models.CASCADE, null=True, blank=True)
     inspection = models.BooleanField('INSPECTION_REQUIRED', default=False, null=True, blank=True)
 
+    def __str__(self):
+        return self.part_name
+
+
+
+
+class SerialNumber(models.Model):
+    serial_number = models.CharField('SERIAL_NUMBER', max_length=30, null=True, blank=True)
+    lot_number = models.CharField('LOT_NUMBER', max_length=6, null=True, blank=True)
+    part = models.ForeignKey(Parts, on_delete=models.CASCADE, null=True, blank=True)
+    date_generated = models.DateField('DATE_GENERATED', null=True, blank=True)
+    notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
+
+    def __str__(self):
+        return self.serial_number
+
+
+class Inventory(models.Model):
+    part = models.ForeignKey(Parts, related_name='PART_NUMBER',on_delete=models.CASCADE, null=True, blank=True)
+    identifier = models.ForeignKey(SerialNumber, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.DecimalField('QUANTITY', decimal_places=4, max_digits=10, null=True, blank=True)
+    description = models.ForeignKey(Parts, related_name='PART_DESCRIPTION',on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField('DATE_ADDED', null=True, blank=True)
+    notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.part)
+
 
 class Orders(models.Model):
+    order_number = get_random_string(length=10, allowed_chars='ABCDEFG1234567890')
+    order_number = models.CharField('ORDER_NUMBER', max_length=10, default=order_number, null=True, blank=True)
     part1 = models.ForeignKey(Parts,related_name='PART1', on_delete=models.CASCADE, null=True, blank=True)
     part1_qty = models.DecimalField("PART1_QTY", decimal_places=4, max_digits=10, null=True, blank=True)
     part1_due_date = models.DateField("PART1_DUE_DATE", null=True, blank=True)
@@ -86,11 +138,14 @@ class Orders(models.Model):
     part10_qty = models.DecimalField("PART10_QTY", decimal_places=4, max_digits=10, null=True, blank=True)
     part10_due_date = models.DateField("PART10_DUE_DATE", null=True, blank=True)
 
+    def __str__(self):
+        return self.order_number
+
 
 
 class OrderGroup(models.Model):
-    #groupordernumber = get_random_string(length=10, allowed_chars='ABCDEFG1234567890')
-    #groupordernumber = models.CharField('GROUP_ORDER_NUMBER',max_length=10, default=groupordernumber, null=True)
+    groupordernumber = get_random_string(length=10, allowed_chars='ABCDEFG1234567890')
+    groupordernumber = models.CharField('GROUP_ORDER_NUMBER',max_length=10, default=groupordernumber, null=True)
     order1 = models.ForeignKey(Orders, related_name='ORDER1', on_delete=models.CASCADE, null=True, blank=True)
     order2 = models.ForeignKey(Orders, related_name='ORDER2', on_delete=models.CASCADE, null=True, blank=True)
     order3 = models.ForeignKey(Orders, related_name='ORDER3', on_delete=models.CASCADE, null=True, blank=True)
@@ -107,4 +162,7 @@ class OrderGroup(models.Model):
     order14 = models.ForeignKey(Orders, related_name='ORDER14', on_delete=models.CASCADE, null=True, blank=True)
     order15 = models.ForeignKey(Orders, related_name='ORDER15', on_delete=models.CASCADE, null=True, blank=True)
 
+
+    def __str__(self):
+        return self.groupordernumber
 
