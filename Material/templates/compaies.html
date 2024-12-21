@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <h1 id="company-name" name="company-name" class="company-name">{{ companies.company_abbreviation }}</h1>
+    <div class="button-container">
+        <button id="add-org-btn">Add Org</button>
+        <button id="edit-org-btn">Edit Org</button>
+    </div>
+    
+    <div class="button-container">
+        <button id="add-company-btn">Add Company</button>
+        <button id="edit-company-btn">Edit Company</button>
+        <button id="remove-company-btn">Remove Company</button>
+    </div>
+</div>
+
+<select>
+    <option value="employee">Employees</option>
+    <option value="departments">Departments</option>
+    <option value="employee">Employee</option>
+</select>
+
+<div>
+    <h2>Employees</h2>
+    <table class="supplier-table" id="employees-table">
+        <thead>
+            <tr>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employeee in employees %}
+            <tr>
+                <td><input type="checkbox" disabled {% if company.active %}checked{% endif %}></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<!-- Add Modals -->
+<div id="add-org-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Organization</h2>
+        <form id="add-org-form" method="post">
+            {% csrf_token %}
+            {{ org_form }}
+            <button type="submit" value="org-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+
+<div id="add-company-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Company</h2>
+        <form id="add-company-form" method="post">
+            {% csrf_token %}
+            {{ company_form }}
+            <button type="submit" value="company-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.getElementById('add-org-btn').onclick = function() {
+    document.getElementById('add-org-modal').style.display = 'block';
+}
+
+document.querySelector('.modal .close').onclick = function() {
+    document.getElementById('add-org-modal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    if (event.target == document.getElementById('add-org-modal')) {
+        document.getElementById('add-org-modal').style.display = 'none';
+    }
+}
+
+document.getElementById('add-company-btn').onclick = function() {
+    document.getElementById('add-company-modal').style.display = 'block';
+}
+
+document.querySelectorAll('.modal .close').forEach(function(element) {
+    element.onclick = function() {
+        element.closest('.modal').style.display = 'none';
+    }
+});
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+
+{% endblock %}

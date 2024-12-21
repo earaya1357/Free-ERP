@@ -31,8 +31,8 @@ class Organization(models.Model):
 
 class Company(models.Model):
     associated_organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
-    company_name = models.CharField('COMPANY_NAME', max_length=50, null=True, blank=True)
-    company_abbreviation = models.CharField('COMPANY_ABBREVIATION', max_length=6, null=True, blank=True)
+    company_name = models.CharField('COMPANY_NAME', unique=True, max_length=50, null=True, blank=True)
+    company_abbreviation = models.CharField('COMPANY_ABBREVIATION', unique=True, max_length=6, null=True, blank=True)
     address = models.CharField('ADDRESS', max_length=75, null=True, blank=True)
     city = models.CharField('CITY', max_length=50, null=True, blank=True)
     state = models.CharField('STATE', max_length=50, null=True, blank=True)
@@ -43,7 +43,7 @@ class Company(models.Model):
     website = models.URLField('WEBSITE', max_length=50, null=True, blank=True)
     notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
     company_id = get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
-    company_id = models.CharField('COMPANY_ID', max_length=10, default=company_id, null=True, blank=True)
+    company_id = models.CharField('COMPANY_ID', unique=True, max_length=10, default=company_id, null=True, blank=True)
     company_password = models.CharField('COMPANY_PASSWORD', max_length=128, null=True, blank=True)
     company_repassword = models.CharField('COMPANY_REPASSWORD', max_length=128, null=True, blank=True)
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
@@ -57,8 +57,8 @@ class Company(models.Model):
 
 
 class Department(models.Model):
-    department_name = models.CharField('DEPARTMENT_NAME', max_length=50, null=True, blank=True)
-    department_abbreviation = models.CharField('DEPARTMENT_ABBREVIATION', max_length=12, null=True, blank=True)
+    department_name = models.CharField('DEPARTMENT_NAME', unique=True, max_length=50, null=True, blank=True)
+    department_abbreviation = models.CharField('DEPARTMENT_ABBREVIATION', unique=True, max_length=12, null=True, blank=True)
     associated_company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     department_id = get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
     department_id = models.CharField('DEPARTMENT_ID', max_length=10, default=department_id, null=True, blank=True)
@@ -71,7 +71,7 @@ class Department(models.Model):
 
 
 class ERPRoles(models.Model):
-    role = models.CharField('ROLE', max_length=50, null=True, blank=True)
+    role = models.CharField('ROLE', unique=True, max_length=50, null=True, blank=True)
     description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
 
     def __str__(self):
@@ -100,7 +100,7 @@ class User(AbstractUser):
     last_login = models.DateTimeField('LAST_LOGIN', auto_now=True, null=True, blank=True)
     email = models.EmailField('EMAIL', max_length=50, null=True, blank=True)
     user_id = get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
-    user_id = models.CharField('USER_ID', max_length=10, default=user_id, null=True, blank=True)
+    user_id = models.CharField('USER_ID', unique=True, max_length=10, default=user_id, null=True, blank=True)
 
 
     def __str__(self):
@@ -119,6 +119,7 @@ class Project(models.Model):
     project_end_date = models.DateField('PROJECT_END_DATE', null=True, blank=True)
     project_manager = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     project_notes = models.TextField('PROJECT_NOTES', max_length=250, null=True, blank=True)
+    project_status = models.CharField('PROJECT_STATUS', max_length=50, null=True, blank=True)
     date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
     active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
 
@@ -149,7 +150,7 @@ class SupplierClass(models.Model):
 
 class Supplier(models.Model):
     """Class to support Supplier information"""
-    name = models.CharField('NAME', max_length=50, null=True, blank=True)
+    name = models.CharField('NAME', unique=True, max_length=50, null=True, blank=True)
     address = models.CharField('ADDRESS', max_length=75, null=True, blank=True)
     city = models.CharField('CITY', max_length=50, null=True, blank=True)
     country = models.CharField('COUNTRY', max_length=50, null=True, blank=True)
@@ -165,6 +166,8 @@ class Supplier(models.Model):
     supplier_class = models.ForeignKey(SupplierClass, on_delete=models.CASCADE,null=True, blank=True)
     notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
     active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
+    last_audit_date = models.DateField('LAST_AUDIT_DATE', null=True, blank=True)
+    associated_company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True, blank=True)
 
 
     def __str__(self):
@@ -173,7 +176,7 @@ class Supplier(models.Model):
 
 
 class PartPrefix(models.Model):
-    prefix = models.CharField('PREFIX', max_length=8, null=True, blank=True)
+    prefix = models.CharField('PREFIX', unique=True, max_length=8, null=True, blank=True)
 
     def __str__(self):
         return self.prefix  
@@ -181,7 +184,7 @@ class PartPrefix(models.Model):
 
 
 class PartSuffix(models.Model):
-    suffix = models.CharField('SUFFIX', max_length=8, null=True, blank=True)
+    suffix = models.CharField('SUFFIX', unique=True, max_length=8, null=True, blank=True)
 
     def __str__(self):
         return self.suffix
@@ -213,7 +216,7 @@ class PartNumberSequence(models.Model):
 
 
 class Parts(models.Model):
-    part_name = models.CharField('PART_NAME', max_length=50, null=True, blank=True)
+    part_name = models.CharField('PART_NAME', unique=True, max_length=50, null=True, blank=True)
     description = models.CharField('DESCRIPTION', max_length=100, null=True, blank=True)
     lot_serial_number = models.CharField('LOT_SERIAL_NUMBER', max_length=6, null=True, blank=True)
     part_number_style = models.ForeignKey(PartNumberSequence, on_delete=models.CASCADE, null=True, blank=True)
@@ -230,6 +233,8 @@ class Parts(models.Model):
     inspection = models.BooleanField('INSPECTION_REQUIRED', default=False, null=True, blank=True)
     date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
     notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
+    associated_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    associated_company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
 
 
     def __str__(self):
@@ -263,7 +268,7 @@ class Inventory(models.Model):
 
 class Orders(models.Model):
     order_number = get_random_string(length=10, allowed_chars='ABCDEFG1234567890')
-    order_number = models.CharField('ORDER_NUMBER', max_length=10, default=order_number, null=True, blank=True)
+    order_number = models.CharField('ORDER_NUMBER', unique=True, max_length=10, default=order_number, null=True, blank=True)
     associated_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     requestor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='REQUESTOR',null=True, blank=True)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='BUYER',null=True, blank=True)
@@ -296,7 +301,7 @@ class Orders(models.Model):
 
 class OrderGroup(models.Model):
     groupordernumber = get_random_string(length=10, allowed_chars='ABCDEFG1234567890')
-    groupordernumber = models.CharField('GROUP_ORDER_NUMBER',max_length=10, default=groupordernumber, null=True)
+    groupordernumber = models.CharField('GROUP_ORDER_NUMBER', unique=True,max_length=10, default=groupordernumber, null=True)
     associated_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     order1 = models.ForeignKey(Orders, related_name='ORDER1', on_delete=models.CASCADE, null=True, blank=True)
     order2 = models.ForeignKey(Orders, related_name='ORDER2', on_delete=models.CASCADE, null=True, blank=True)

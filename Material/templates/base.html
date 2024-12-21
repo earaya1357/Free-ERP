@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <h1>FreeERP</h1>
+        <h1>FreeERP{% if organizations.organization_name %} -{{ organizations.organization_name }} {% endif %} {% if companies.company_abbreviation %} -{{ companies.company_abbreviation }} {% endif %} </h1>
         <nav>
             <ul>
                 <button onclick="location.href='{% url 'home' %}'">Home</button>

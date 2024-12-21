@@ -3,8 +3,26 @@ from .forms import *
 from .models import *
 
 
+def admin(request):
+    try:
+        organizations = Organization.objects.get(id=1)
+        companies = Company.objects.filter(associated_organization=organizations)
+    except Organization.DoesNotExist:
+        print('Organization does not exist')
+        organizations = None
+        companies = None
+    return render(request, 'admin.html', context={'organizations': organizations, 'companies': companies})
+
+
 def home(request):
-    return render(request, 'index.html')
+    try:
+        organizations = Organization.objects.get(id=1)
+        companies = Company.objects.filter(associated_organization=organizations)
+    except Organization.DoesNotExist:
+        print('Organization does not exist')
+        organizations = None
+        companies = None
+    return render(request, 'index.html', context={'organizations': organizations, 'companies': companies})
 
 ##### Organization Section #####
 def organizations(request):
