@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome to FreeERP</h1>
+    <div class="button-container">
+        <button onclick="location.href='{% url 'organizations' %}'">Organizations-Company</button>
+        <button onclick="location.href='{% url 'inventory' %}'">Inventory</button>
+        <button onclick="location.href='#'">Orders</button>
+        <button onclick="location.href='#'">Planning</button>
+        <button onclick="location.href='#'">Requests</button>
+        <button onclick="location.href='#'">Issues</button>
+        <button onclick="location.href='#'">Reports</button>
+        <button onclick="location.href='#'">Settings</button>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Supplier</h1>
+    <div class="button-container" id="supplier-btn-container">
+        <button id="add-supplier-btn">Add Supplier</button>
+        <button id="edit-supplier-btn">Edit Supplier</button>
+        <button id="remove-supplier-btn">Remove Supplier</button>
+    </div>
+</div>
+<div class="supplier-info" id="supplier-info">
+    <table class="supplier-table" id="supplier-table">
+        <tr>
+            <th>Active</th>
+            <th>Supplier Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>State</th>
+            <th>Zip</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Approved</th>
+            <th>Approval Date</th>
+            <th>Approval By</th>
+            <th>Approval Notes</th>
+            <th>Supplier Class</th>
+            <th>Notes</th>
+        </tr>
+        {% for supplier in suppliers %}
+        <tr>
+            <td><input type="checkbox" {% if supplier.active %}checked{% endif %} disabled></td>
+            <td>{{ supplier.name }}</td>
+            <td>{{ supplier.address }}</td>
+            <td>{{ supplier.city }}</td>
+            <td>{{ supplier.country }}</td>
+            <td>{{ supplier.state }}</td>
+            <td>{{ supplier.zip }}</td>
+            <td>{{ supplier.phone }}</td>
+            <td>{{ supplier.email }}</td>
+            <td>{{ supplier.website }}</td>
+            <td>{{ supplier.approved }}</td>
+            <td>{{ supplier.approval_date }}</td>
+            <td>{{ supplier.approval_by }}</td>
+            <td>{{ supplier.approval_notes }}</td>
+            <td>{{ supplier.supplier_class }}</td>
+            <td>{{ supplier.notes }}</td>
+        </tr>
+        {% endfor %}
+</div>
+
+
+
+<!---------------Modal Forms--------------------->
+
+<!--Modal Form for new suppliers-->
+<div id="supplier-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="supplier-form" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Add Supplier</button>
+        </form>
+    </div>
+</div>
+
+<!--Modal Form to edit suppliers-->
+<div id="supplier-edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="supplier-edit-form" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Edit Supplier</button>
+        </form>
+    </div>
+</div>
+
+
+<!--Modal Form to remove suppliers-->
+<div id="supplier-remvoal-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="supplier-removal-form" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Remove Supplier</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+document.getElementById('add-supplier-btn').addEventListener('click', function() {
+    document.getElementById('supplier-modal').style.display = 'block';
+});
+
+document.getElementById('edit-supplier-btn').addEventListener('click', function() {
+    document.getElementById('supplier-modal').style.display = 'block';
+});
+
+document.getElementById('remove-supplier-btn').addEventListener('click', function() {
+    document.getElementById('supplier-modal').style.display = 'block';
+});
+
+document.getElementsByClassName('close')[0].addEventListener('click', function() {
+    document.getElementById('supplier-modal').style.display = 'none';
+});
+
+window.addEventListener('click', function(event) {
+    if (event.target == document.getElementById('supplier-modal')) {
+        document.getElementById('supplier-modal').style.display = 'none';
+    }
+});
+
+
+
+</script>
+{% endblock %}
