@@ -6,6 +6,7 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = '__all__'
+        exclude = ['is_superuser', 'is_staff','groups', 'user_permissions']
 
 
 class ERPRoleForm(ModelForm):
@@ -26,6 +27,23 @@ class ProjectForm(ModelForm):
         fields = '__all__'
 
 
+class ProjectTeamForm(ModelForm):
+    class Meta:
+        model = ProjectTeam
+        fields = '__all__'
+
+
+class PartNumberTypeForm(ModelForm):
+    class Meta:
+        model = PartNumberType
+        fields = '__all__'
+
+class PartClassForm(ModelForm):
+    class Meta:
+        model = PartClass
+        fields = '__all__'
+
+
 class PartPrefixForm(ModelForm):
     class Meta:
         model = PartPrefix
@@ -38,11 +56,16 @@ class PartSuffixForm(ModelForm):
         fields = '__all__'
 
 
-class PartNumberSequence(ModelForm):
+class PartNumberSequenceForm(ModelForm):
     class Meta:
         model = PartNumberSequence
         fields = '__all__'
 
+
+class PartsForm(ModelForm):
+    class Meta:
+        model = Parts
+        fields = '__all__'
 
 class OrganizationForm(ModelForm):
     class Meta:

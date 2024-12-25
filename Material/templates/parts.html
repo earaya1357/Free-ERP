@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <select id="add-select">
+        <option value="parts">Parts</option>
+        <option value="prefix">Prefix</option>
+        <option value="suffix">Suffix</option>
+        <option value="sequence">Sequence</option>
+        <option value="sequence-type">Sequence Type</option>
+        <option value="part-class">Part Class</option>
+    </select>
+</div>
+<button id="add-btn">Add</button>
+
+
+
+<div class="parts-info" id="parts-info">
+    <table class="parts-table" id="parts-table">
+        <tr>
+            <th>Active</th>
+            <th>Associated Project</th>
+            <th>Associated Company</th>
+            <th>Part Name</th>
+            <th>Part Description</th>
+            <th>Part Tracking Type</th>
+            <th>Part Sequence</th>
+            <th>Part Revision</th>
+            <th>Base Qty</th>
+            <th>UOM</th>
+            <th>Part Number</th>
+            <th>Part Class</th>
+            <th>Part Notes</th>
+            
+        </tr>
+        {% for part in parts %}
+        <tr>
+            <td><input type="checkbox" {% if part.is_active %}checked{% endif %} disabled></td>
+            <td>{{ part.associated_project }}</td>
+            <td>{{ part.associated_company }}</td>
+            <td>{{ part.part_name }}</td>
+            <td>{{ part.description }}</td>
+            <td>{{ part.lot_serial_number }}</td>
+            <td>{{ part.part_number_style }}</td>
+            <td>{{ part.revision }}</td>
+            <td>{{ part.base_qty }}</td>
+            <td>{{ part.uom }}</td>
+            <td>{{ part.part_number }}</td>
+            <td>{{ part.part_class }}</td>
+            <td>{{ part.notes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+<!------ New User Modal------->
+<div id="add-part-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Part</h2>
+        <form id="add-user-form" method="post">
+            {% csrf_token %}
+            {{ part_form }}
+            <button type="submit" value="part-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-prefix-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Prefix</h2>
+        <form id="add-prefix-form" method="post">
+            {% csrf_token %}
+            {{ prefix_form }}
+            <button type="submit" value="prefix-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-suffix-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add suffix</h2>
+        <form id="add-suffix-form" method="post">
+            {% csrf_token %}
+            {{ suffix_form }}
+            <button type="submit" value="suffix-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-sequence-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Sequence</h2>
+        <form id="add-sequence-form" method="post">
+            {% csrf_token %}
+            {{ sequence_form }}
+            <button type="submit" value="sequence-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-sequence-type-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Sequence Type</h2>
+        <form id="add-sequence-type-form" method="post">
+            {% csrf_token %}
+            {{ part_sequence_type_form }}
+            <button type="submit" value="sequence-type-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-part-class-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Part Type</h2>
+        <form id="add-part-class-form" method="post">
+            {% csrf_token %}
+            {{ part_class_form }}
+            <button type="submit" value="part-class-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    //open the modal based on the selected option
+    document.getElementById('add-btn').addEventListener('click', function() {
+        if (document.getElementById('add-select').value == 'parts') {
+            document.getElementById('add-part-modal').style.display = 'block';
+        } else if (document.getElementById('add-select').value == 'prefix') {
+            document.getElementById('add-prefix-modal').style.display = 'block';
+        } else if (document.getElementById('add-select').value == 'suffix') {
+            document.getElementById('add-suffix-modal').style.display = 'block';
+        } else if (document.getElementById('add-select').value == 'sequence') {
+            document.getElementById('add-sequence-modal').style.display = 'block';
+        } else if (document.getElementById('add-select').value == 'sequence-type') {
+            document.getElementById('add-sequence-type-modal').style.display = 'block';
+        } else if (document.getElementById('add-select').value == 'part-class') {
+            document.getElementById('add-part-class-modal').style.display = 'block';
+        }
+    });
+
+    //close the modal
+    document.querySelectorAll('.modal .close').forEach(function(element) {
+    element.onclick = function() {
+        element.closest('.modal').style.display = 'none';
+        }
+    });
+
+    window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+        }
+    }
+        
+    </script>
+    {% endblock %}

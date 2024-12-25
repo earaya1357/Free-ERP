@@ -22,6 +22,7 @@ class Organization(models.Model):
     org_repassword = models.CharField('ORG_REPASSWORD', max_length=128, null=True, blank=True)
     org_abbreviation = models.CharField('ORG_ABBREVIATION', max_length=6, null=True, blank=True)
     date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
     organization_logo = models.ImageField('ORGANIZATION_LOGO', upload_to='images/', null=True, blank=True)
 
     def __str__(self):
@@ -57,6 +58,7 @@ class Company(models.Model):
 
 
 class Department(models.Model):
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
     department_name = models.CharField('DEPARTMENT_NAME', unique=True, max_length=50, null=True, blank=True)
     department_abbreviation = models.CharField('DEPARTMENT_ABBREVIATION', unique=True, max_length=12, null=True, blank=True)
     associated_company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
@@ -71,14 +73,19 @@ class Department(models.Model):
 
 
 class ERPRoles(models.Model):
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
     role = models.CharField('ROLE', unique=True, max_length=50, null=True, blank=True)
+    associated_company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True, blank=True)
+    associated_department = models.ForeignKey(Department, on_delete=models.CASCADE,null=True, blank=True)
     description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
+    date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.role
 
 
 class User(AbstractUser):
+    username = models.CharField('USERNAME', unique=True, max_length=30, null=True, blank=True)
     first_name = models.CharField('FIRST_NAME', max_length=30, null=True, blank=True)
     last_name = models.CharField('LAST_NAME', max_length=30, null=True, blank=True)
     password = models.CharField('PASSWORD', max_length=128, null=True, blank=True)
@@ -92,6 +99,7 @@ class User(AbstractUser):
     state = models.CharField('STATE', max_length=50, null=True, blank=True)
     zip = models.CharField('ZIP', max_length=10, null=True, blank=True)
     country = models.CharField('COUNTRY', max_length=50, null=True, blank=True)
+    notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
     groups = models.ManyToManyField(Group, related_name='material_user_set')
     user_permissions = models.ManyToManyField(Permission, related_name='material_user_permissions_set')
     is_staff = models.BooleanField('STAFF_STATUS', default=False, null=True, blank=True)
@@ -99,18 +107,24 @@ class User(AbstractUser):
     date_joined = models.DateTimeField('DATE_JOINED', auto_now_add=True, null=True, blank=True)
     last_login = models.DateTimeField('LAST_LOGIN', auto_now=True, null=True, blank=True)
     email = models.EmailField('EMAIL', max_length=50, null=True, blank=True)
-    user_id = get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
-    user_id = models.CharField('USER_ID', unique=True, max_length=10, default=user_id, null=True, blank=True)
-
+    user_id = models.CharField('USER_ID', unique=True, max_length=10, default=get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890'), null=True, blank=True)
+    is_superuser = models.BooleanField('SUPERUSER_STATUS', default=False, null=True, blank=True)
+    profile_picture = models.ImageField('PROFILE_PICTURE', upload_to='images/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.username})"
 
 
 class Project(models.Model):
+    PROJECT_STATUS = (
+        ('NOT STARTED','NOT STARTED'),
+        ('ON TRACk','ON TRACK'),
+        ('OFF TRACK','OFF TRACK'),
+        ('COMPLETED','COMPLETED'),
+        ('CANCELLED','CANCELLED')
+    )
     project_name = models.CharField('PROJECT_NAME', max_length=50, null=True, blank=True)
     project_abbreviation = models.CharField('PROJECT_ABBREVIATION', max_length=6, null=True, blank=True)
-    project_description = models.TextField('PROJECT_DESCRIPTION', max_length=250, null=True, blank=True)
     project_id = get_random_string(length=10, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
     project_id = models.CharField('PROJECT_ID', max_length=10, default=project_id, null=True, blank=True)
     project_description = models.TextField('PROJECT_DESCRIPTION', max_length=250, null=True, blank=True)
@@ -119,7 +133,7 @@ class Project(models.Model):
     project_end_date = models.DateField('PROJECT_END_DATE', null=True, blank=True)
     project_manager = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     project_notes = models.TextField('PROJECT_NOTES', max_length=250, null=True, blank=True)
-    project_status = models.CharField('PROJECT_STATUS', max_length=50, null=True, blank=True)
+    project_status = models.CharField('PROJECT_STATUS', choices=PROJECT_STATUS, default= 'NOT STARTED',max_length=50, null=True, blank=True)
     date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
     active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
 
@@ -176,7 +190,9 @@ class Supplier(models.Model):
 
 
 class PartPrefix(models.Model):
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
     prefix = models.CharField('PREFIX', unique=True, max_length=8, null=True, blank=True)
+    prefix_description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
 
     def __str__(self):
         return self.prefix  
@@ -184,14 +200,25 @@ class PartPrefix(models.Model):
 
 
 class PartSuffix(models.Model):
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
     suffix = models.CharField('SUFFIX', unique=True, max_length=8, null=True, blank=True)
+    suffix_description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
 
     def __str__(self):
         return self.suffix
 
 
+class PartNumberType(models.Model):
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
+    type = models.CharField('TYPE', unique=True, max_length=50, null=True, blank=True)
+    description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
+
+    def __str__(self):
+        return self.type
+
 
 class PartNumberSequence(models.Model):
+    type = models.ForeignKey(PartNumberType, on_delete=models.CASCADE, null=True, blank=True)
     prefix = models.ForeignKey(PartPrefix, on_delete=models.CASCADE, null=True, blank=True)
     suffix = models.ForeignKey(PartSuffix, on_delete=models.CASCADE, null=True, blank=True)
     middle = models.CharField('MIDDLE', max_length=10, null=True, blank=True)
@@ -207,20 +234,36 @@ class PartNumberSequence(models.Model):
             self.middle = ''
         if self.spacer is None:
             self.spacer = ''
-        return str(Concat(self.prefix, Value(self.spacer), self.middle, Value(self.spacer), self.suffix))
+        return str(self.prefix) + str(self.spacer) + str(self.middle) + str(self.spacer) + str(self.suffix)
     
     def __str__(self):
         return self.get_part_number_sequence()
     
-    
+
+class PartClass(models.Model):
+    category = models.CharField('CLASS', unique=True, max_length=50, null=True, blank=True)
+    description = models.TextField('DESCRIPTION', max_length=150, null=True, blank=True)
+
+    def __str__(self):
+        return self.category
 
 
 class Parts(models.Model):
+    LSN = (
+        ('LOT','LOT'),
+        ('SERIAL','SERIAL'),
+        ('N/A','N/A')
+        )
+
+    active = models.BooleanField('ACTIVE', default=True, null=True, blank=True)
+    associated_project = models.ManyToManyField(Project, default=None, blank=True)
+    associated_company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    part_class = models.ForeignKey(PartClass, on_delete=models.CASCADE, null=True, blank=True)
     part_name = models.CharField('PART_NAME', unique=True, max_length=50, null=True, blank=True)
     description = models.CharField('DESCRIPTION', max_length=100, null=True, blank=True)
-    lot_serial_number = models.CharField('LOT_SERIAL_NUMBER', max_length=6, null=True, blank=True)
+    lot_serial_number = models.CharField('LOT_SERIAL_NUMBER', max_length=6, choices=LSN,null=True, blank=True)
     part_number_style = models.ForeignKey(PartNumberSequence, on_delete=models.CASCADE, null=True, blank=True)
-    revision = models.CharField('REVISION', max_length=6, null=True, blank=True)
+    revision = models.CharField('REVISION', max_length=6, unique=True, null=True, blank=True)
     base_qty = models.DecimalField('BASE_QTY', decimal_places=4, max_digits=10, null=True, blank=True)
     uom = models.CharField('UNIT_OF_MEASURE', max_length=10, null=True, blank=True)
     part_number = models.CharField('PART_NUMBER', max_length=30, null=True, blank=True)
@@ -232,9 +275,10 @@ class Parts(models.Model):
     supplier3 = models.ForeignKey(Supplier, related_name='SUPPLIER3', on_delete=models.CASCADE, null=True, blank=True)
     inspection = models.BooleanField('INSPECTION_REQUIRED', default=False, null=True, blank=True)
     date_created = models.DateField('DATE_CREATED', auto_now_add=True, null=True, blank=True)
+    date_active = models.DateField('DATE_ACTIVE', null=True, blank=True)
+    date_inactive = models.DateField('DATE_INACTIVE', null=True, blank=True)
     notes = models.TextField('NOTES', max_length=250, null=True, blank=True)
-    associated_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
-    associated_company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+
 
 
     def __str__(self):

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <select>
+        <option value="user">User</option>
+    </select>
+</div>
+<button id="add-user-btn">Add User</button>
+
+
+
+<div class="user-info" id="user-info">
+    <table class="user-table" id="user-table">
+        <tr></tr>
+        <th>Active</th>
+        <th>Username</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Role</th>
+        <th>Notes</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td><input type="checkbox" {% if user.is_active %}checked{% endif %} disabled></td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.notes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+<!------ New User Modal------->
+<div id="add-user-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add User</h2>
+        <form id="add-user-form" method="post">
+            {% csrf_token %}
+            {{ user_form }}
+            <button type="submit" value="user-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    // username = document.getElementById('id_username');
+    // username.disabled = true;
+    // fname = document.getElementById('id_first_name');
+    // lname = document.getElementById('id_last_name');
+
+    // //create a the username as fname.lastname and populate the username field. The username field should be disabled
+    // document.addEventListener('', function() {
+    //     username.value = fname.value + '.' + lname.value;
+    // });
+    
+    
+
+
+    document.getElementById('add-user-btn').addEventListener('click', function() {
+        document.getElementById('add-user-modal').style.display = 'block';
+    });
+    
+    document.getElementById('edit-user-btn').addEventListener('click', function() {
+        document.getElementById('edit-user-modal').style.display = 'block';
+    });
+    
+    
+    document.getElementsByClassName('close')[0].addEventListener('click', function() {
+        document.getElementById('add-user-modal').style.display = 'none';
+    });
+    
+    window.addEventListener('click', function(event) {
+        if (event.target == document.getElementById('supplier-modal')) {
+            document.getElementById('edit-user-modal').style.display = 'none';
+        }
+    });
+    
+    
+    
+    </script>
+    {% endblock %}

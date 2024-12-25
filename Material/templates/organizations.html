@@ -7,17 +7,16 @@
         <button id="add-org-btn">Add Org</button>
         <button id="edit-org-btn">Edit Org</button>
     </div>
-    
+</div>
+
+<div>
+    <h2>Organizations</h2>
     <div class="button-container">
         <button id="add-company-btn">Add Company</button>
         <button id="edit-company-btn">Edit Company</button>
         <button id="remove-company-btn">Remove Company</button>
     </div>
-</div>
-
-<div>
-    <h2>Organizations</h2>
-    <table class="supplier-table" id="supplier-table">
+    <table class="organizations-table" id="organizations-table">
         <thead>
             <tr>
                 <th>Active</th>
@@ -58,6 +57,75 @@
         </tbody>
     </table>
 
+
+    <div>
+        <h2>Departments</h2>
+        <div class="button-container">
+            <button id="add-department-btn">Add Department</button>
+            <button id="edit-department-btn">Edit Department</button>
+            <button id="remove-department-btn">Remove Department</button>
+        </div>
+        <table class="departments-table" id="departments-table">
+            <thead>
+                <tr>
+                    <th>Active</th>
+                    <th>Department Name</th>
+                    <th>Department Abbreviation</th>
+                    <th>Associated Company</th>
+                    <th>Department ID</th>
+                    <th>Date Created</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for department in departments %}
+                <tr>
+                    <td><input type="checkbox" disabled {% if company.active %}checked{% endif %}></td>
+                    <td>{{ department.department_name }}</td>
+                    <td>{{ department.department_abbreviation }}</td>
+                    <td> {{ department.associated_company }}</td>
+                    <td> {{ department.department_id }}</td>
+                    <td> {{ department.date_created }}</td>
+                    <td> {{ department.notes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+
+        <div>
+            <h2>ERP Roles</h2>
+            <div class="button-container">
+                <button id="add-erprole-btn">Add ERP Role</button>
+                <button id="edit-erprole-btn">Edit ERP Role</button>
+                <button id="remove-erprole-btn">Remove ERP Role</button>
+            </div>
+            <table class="erproles-table" id="erproles-table">
+                <thead>
+                    <tr>
+                        <th>Active</th>
+                        <th>Role</th>
+                        <th>Associated Company</th>
+                        <th>Associated Department</th>
+                        <th>Description</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in roles %}
+                    <tr>
+                        <td><input type="checkbox" disabled {% if company.active %}checked{% endif %}></td>
+                        <td>{{ role.role }}</td>
+                        <td>{{ role.associated_company }}</td>
+                        <td> {{ role.associated_department }}</td>
+                        <td> {{ role.description }}</td>
+                        <td> {{ role.date_created }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
 <!-- Add Modals -->
 <div id="add-org-modal" class="modal">
     <div class="modal-content">
@@ -84,8 +152,33 @@
     </div>
 </div>
 
+<div id="add-role-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Role</h2>
+        <form id="add-role-form" method="post">
+            {% csrf_token %}
+            {{ role_form }}
+            <button type="submit" value="role-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="add-department-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Department</h2>
+        <form id="add-department-form" method="post">
+            {% csrf_token %}
+            {{ department_form }}
+            <button type="submit" value="department-form" name="form-submit">Submit</button>
+        </form>
+    </div>
+</div>
+
 
 <script>
+
 document.getElementById('add-org-btn').onclick = function() {
     document.getElementById('add-org-modal').style.display = 'block';
 }
@@ -102,6 +195,38 @@ window.onclick = function(event) {
 
 document.getElementById('add-company-btn').onclick = function() {
     document.getElementById('add-company-modal').style.display = 'block';
+}
+
+document.querySelectorAll('.modal .close').forEach(function(element) {
+    element.onclick = function() {
+        element.closest('.modal').style.display = 'none';
+    }
+});
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+
+document.getElementById('add-department-btn').onclick = function() {
+    document.getElementById('add-department-modal').style.display = 'block';
+}
+
+document.querySelectorAll('.modal .close').forEach(function(element) {
+    element.onclick = function() {
+        element.closest('.modal').style.display = 'none';
+    }
+});
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+
+document.getElementById('add-erprole-btn').onclick = function() {
+    document.getElementById('add-role-modal').style.display = 'block';
 }
 
 document.querySelectorAll('.modal .close').forEach(function(element) {
